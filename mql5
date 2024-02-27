@@ -1,0 +1,131 @@
+
+// Pearl Forex Software
+// Developer's Site: forexroboteasy.com
+// Development: Forex Robot Easy Team
+
+// Include necessary libraries
+#include <Trade\Trade.mqh>
+#include <Expert\Expert.mqh>
+#include <Grid\Grid.mqh>
+#include <Martingale\Martingale.mqh>
+
+// Define constants
+#define SYMBOL 'EURUSD'
+#define LOT_SIZE 0.1
+#define GRID_DISTANCE 20
+#define VOLATILITY_THRESHOLD 0.01
+#define MAX_GRID_LEVELS 10
+
+// Create an instance of trade class
+CTrade trade;
+
+// Create an instance of expert class
+CExpert expert('Pearl');
+
+// Create an instance of grid class
+CGrid grid;
+
+// Create an instance of martingale class
+CMartingale martingale;
+
+// Initialize the expert advisor
+int OnInit()
+{
+    // Set up trade parameters
+    trade.SetType(TRADE_TYPE_PENDING);
+    trade.SetSymbol(SYMBOL);
+    trade.SetLots(LOT_SIZE);
+
+    // Set up grid parameters
+    grid.SetDistance(GRID_DISTANCE);
+    grid.SetMaxLevels(MAX_GRID_LEVELS);
+
+    return(INIT_SUCCEEDED);
+}
+
+// Perform market analysis and open trades
+void OnTick()
+{
+    // Perform comprehensive Forex market analysis
+    double trend = GetD1Trend();
+    double volatility = GetVolatility();
+
+    // Check if the code aligns with the overall D1-trend
+    if (trend == 1)
+    {
+        // Check if volatility is below the threshold
+        if (volatility < VOLATILITY_THRESHOLD)
+        {
+            // Open trades using grid strategy
+            OpenTrades();
+        }
+        else
+        {
+            // Wait for volatility to decrease
+            Sleep(1000);
+        }
+    }
+}
+
+// Get the D1-trend of the Forex market
+double GetD1Trend()
+{
+    // Implementation logic goes here
+    // Return the trend value (1 for uptrend, -1 for downtrend)
+}
+
+// Get the volatility of the Forex market
+double GetVolatility()
+{
+    // Implementation logic goes here
+    // Return the volatility value
+}
+
+// Open trades using grid strategy
+void OpenTrades()
+{
+    // Calculate grid levels
+    grid.CalculateLevels();
+
+    // Iterate through grid levels
+    for (int i = 0; i < grid.GetLevelsCount(); i++)
+    {
+        // Check if the price surpasses a grid level and volatility remains high
+        if (PriceSurpassesLevel(i) && VolatilityRemainsHigh())
+        {
+            // Skip the grid level
+            continue;
+        }
+
+        // Open trade at the current grid level
+        trade.SetOpenPrice(grid.GetLevel(i));
+        trade.Buy();
+    }
+
+    // Increase lot size using martingale strategy
+    martingale.IncreaseLotSize();
+}
+
+// Check if the price surpasses a grid level
+bool PriceSurpassesLevel(int level)
+{
+    // Implementation logic goes here
+    // Return true if the price surpasses the grid level, false otherwise
+}
+
+// Check if volatility remains high
+bool VolatilityRemainsHigh()
+{
+    // Implementation logic goes here
+    // Return true if volatility remains high, false otherwise
+}
+
+// The logical conclusion of the code
+void OnDeinit(const int reason)
+{
+    // Close all open trades
+    trade.CloseAll();
+
+    // Output the reason for deinitialization
+    Print('Expert advisor deinitialized. Reason: ', reason);
+}
